@@ -6,16 +6,27 @@
     <title>Document</title>
 </head>
 <body>
-    
-        <form action="process.php" method="post">   
-            <p>Name : </p>
-            <input type = "text" name="username"><br>
-            <p>Password </p>
-            <input type = "password" name="Password"><br>
-            <input type ="submit"value="click">
-            
+  <!-- Get form  -->
 
-        </form>
+  <form action = "process.php" method="get">
+     Name : <input type="text" name="username">
+     <input type = "submit" value="Click me">
+  </form>
     
+  <!-- post form  -->
+   <form action = "process.php" method="post">
+     Name : <input type="text" name="username">
+     <input type = "submit" value="Click me">
+  </form>
+
+  <!-- file upload form -->
+
+  <form action="process.php" method="post" enctype="multipart/form-data">
+
+    file : <input type="file" name ="myFile">
+    <input type = "submit" value="Upload a file">
+   </form>
+
+   
 </body>
 </html>
