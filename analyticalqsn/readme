@@ -1,0 +1,16 @@
+Problem1: An HTML form is used to submit information to a server page defined in the action attribute of 
+the form tag. The button that is to be clicked to send data to server must be ‘submit’ in type to perform this 
+action. At the server side, data is received using $_REQUEST server variable with the corresponding 
+HTML control name as the key to that server variable. 
+ Create a PHP page named “registration.php”, that will contain a HTML form that will have 
+following input fields: First Name, Last Name, DOB, Gender, Phone, Email ID, Password and 
+Confirm password. 
+o First Name, Last Name, DOB, Phone and Email will be textbox, Gender will be Radio 
+Button and Password and Confirm password will be password in type. 
+o Make sure you have defined “showdata.php” as the value of action attribute of your HTML 
+form. 
+ Create a PHP page named “showdata.php” that receives the values submitted by your HTML form 
+and displays the data. The data will only be shown if the user does not enter any empty data. 
+o If user enters any empty data, it redirects to “registration.php”. 
+o Otherwise, all the data will be printed and email, password field will be stored in Session 
+and redirect to “login.php”. 

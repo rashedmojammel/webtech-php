@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="dash.css">
+</head>
+<body>
+    <div class="dash-shell">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Hostel</div>
+    <div class="sidebar-tagline">Manager panel</div>
+    <ul class="sidebar-nav">
+      <li><a class="sidebar-link active" href="?controller=manager&action=dashboard"><span class="icon">🏠</span>Dashboard</a></li>
+      <li><a class="sidebar-link" href="#"><span class="icon">⚠️</span>Complaints</a></li>
+      <li><a class="sidebar-link" href="#"><span class="icon">🛏️</span>Rooms</a></li>
+      <li><a class="sidebar-link" href="#"><span class="icon">👥</span>Students</a></li>
+      <li><a class="sidebar-link" href="/hostel_system/public/logout.php"><span class="icon">🚪</span>Logout</a></li>
+    </ul>
+    <div class="sidebar-footer">Logged in as manager</div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-title">Manager dashboard</div>
+        <div class="topbar-sub">Focus on complaints, rooms and active students</div>
+      </div>
+      <div class="topbar-user">
+        <div class="topbar-avatar"><?php echo strtoupper($_SESSION['name'][0]); ?></div>
+        <span class="name"><?php echo htmlspecialchars($_SESSION['name']); ?></span>
+      </div>
+    </div>
+
+    <div class="main-inner">
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Pending complaints</div>
+          <div class="stat-value"><?php echo (int)$pendingComplaints; ?></div>
+          <span class="stat-pill">Attention</span>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Assigned today</div>
+          <div class="stat-value"><?php echo (int)$assignedTasks; ?></div>
+          <div class="stat-meta">Status: In Progress</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Completed today</div>
+          <div class="stat-value"><?php echo (int)$completedToday; ?></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total rooms</div>
+          <div class="stat-value"><?php echo (int)$totalRooms; ?></div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <!-- Left: Complaints -->
+        <section>
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Complaints queue</h3>
+              <span class="card-sub">Latest issues</span>
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Student</th><th>Room</th>
+                  <th>Subject</th><th>Priority</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+              <?php while ($c = $complaints->fetch_assoc()): ?>
+                <tr>
+                  <td>#C<?php echo $c['id']; ?></td>
+                  <td><?php echo htmlspecialchars($c['student']); ?></td>
+                  <td><?php echo htmlspecialchars($c['room_no']); ?></td>
+                  <td><?php echo htmlspecialchars($c['subject']); ?></td>
+                  <td>
+                    <span class="badge-soft <?php
+                      echo $c['priority']=='High'?'red':($c['priority']=='Medium'?'yellow':'');
+                    ?>">
+                      <?php echo htmlspecialchars($c['priority']); ?>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge-soft <?php
+                      echo $c['status']=='Resolved'?'green':($c['status']=='Pending'?'red':'yellow');
+                    ?>">
+                      <?php echo htmlspecialchars($c['status']); ?>
+                    </span>
+                  </td>
+                </tr>
+              <?php endwhile; ?>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Right: Rooms + Students -->
+        <section>
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Room status</h3>
+              <span class="card-sub">All rooms</span>
+            </div>
+            <table class="table">
+              <thead>
+                <tr><th>Room</th><th>Type</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+              <?php while ($r = $rooms->fetch_assoc()): ?>
+                <tr>
+                  <td><?php echo htmlspecialchars($r['room_no']); ?></td>
+                  <td><?php echo htmlspecialchars($r['type']); ?></td>
+                  <td>
+                    <span class="badge-soft <?php
+                      echo $r['status']=='available'?'green':($r['status']=='maintenance'?'yellow':'red');
+                    ?>">
+                      <?php echo htmlspecialchars($r['status']); ?>
+                    </span>
+                  </td>
+                </tr>
+              <?php endwhile; ?>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card" style="margin-top:16px;">
+            <div class="card-header">
+              <h3 class="card-title">Active students</h3>
+              <span class="card-sub">Students with active bookings</span>
+            </div>
+            <table class="table">
+              <thead>
+                <tr><th>ID</th><th>Name</th><th>Room</th><th>Phone</th><th>Check-in</th></tr>
+              </thead>
+              <tbody>
+              <?php while ($s = $students->fetch_assoc()): ?>
+                <tr>
+                  <td>#<?php echo $s['id']; ?></td>
+                  <td><?php echo htmlspecialchars($s['name']); ?></td>
+                  <td><?php echo htmlspecialchars($s['room_no']); ?></td>
+                  <td><?php echo htmlspecialchars($s['phone']); ?></td>
+                  <td><?php echo htmlspecialchars($s['check_in_date']); ?></td>
+                </tr>
+              <?php endwhile; ?>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

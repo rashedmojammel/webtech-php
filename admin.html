@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="dash.css">
+</head>
+<body>
+    <div class="dash-shell">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Hostel Admin</div>
+    <ul class="sidebar-nav">
+      <li><a class="sidebar-link active" href="?controller=admin&action=dashboard">Dashboard</a></li>
+      <li><a class="sidebar-link" href="#">Students</a></li>
+      <li><a class="sidebar-link" href="#">Rooms</a></li>
+      <li><a class="sidebar-link" href="#">Bookings</a></li>
+      <li><a class="sidebar-link" href="#">Payments</a></li>
+      <li><a class="sidebar-link" href="#">Complaints</a></li>
+      <li><a class="sidebar-link" href="#">Events</a></li>
+      <li><a class="sidebar-link" href="login.html">Logout</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title">Admin Dashboard</div>
+      <div class="topbar-user">
+        <span class="topbar-avatar"><?php echo strtoupper($_SESSION['name'][0]); ?></span>
+        <span><?php echo htmlspecialchars($_SESSION['name']); ?></span>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total students</div>
+        <div class="stat-value"><?php echo $stats['total_students']; ?></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total rooms</div>
+        <div class="stat-value"><?php echo $stats['total_rooms']; ?></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total bookings</div>
+        <div class="stat-value"><?php echo $stats['total_bookings']; ?></div>
+        <span class="stat-pill">Live</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total payments</div>
+        <div class="stat-value">₹<?php echo $stats['total_payments']; ?></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending complaints</div>
+        <div class="stat-value"><?php echo $stats['pending_complaints']; ?></div>
+        <span class="stat-pill">Attention</span>
+      </div>
+    </div>
+
+    <!-- Two-column content -->
+    <div class="dash-grid">
+      <section>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Recent bookings</h3>
+            <span class="card-sub">Last 10 records</span>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Booking ID</th>
+                <th>Student</th>
+                <th>Room</th>
+                <th>Check-in</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+            <?php while ($b = $bookings->fetch_assoc()): ?>
+              <tr>
+                <td><?php echo htmlspecialchars($b['booking_code'] ?: ('#B'.$b['id'])); ?></td>
+                <td><?php echo htmlspecialchars($b['student']); ?></td>
+                <td><?php echo htmlspecialchars($b['room_no']); ?></td>
+                <td><?php echo htmlspecialchars($b['check_in_date']); ?></td>
+                <td>
+                  <span class="badge-soft <?php echo $b['status']=='active'?'green':($b['status']=='pending'?'yellow':''); ?>">
+                    <?php echo htmlspecialchars($b['status']); ?>
+                  </span>
+                </td>
+              </tr>
+            <?php endwhile; ?>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card" style="margin-top:14px;">
+          <div class="card-header">
+            <h3 class="card-title">Students</h3>
+            <span class="card-sub">All active students</span>
+          </div>
+          <table class="table">
+            <thead>
+              <tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th></tr>
+            </thead>
+            <tbody>
+            <?php while ($s = $students->fetch_assoc()): ?>
+              <tr>
+                <td><?php echo $s['id']; ?></td>
+                <td><?php echo htmlspecialchars($s['name']); ?></td>
+                <td><?php echo htmlspecialchars($s['email']); ?></td>
+                <td><?php echo htmlspecialchars($s['phone']); ?></td>
+              </tr>
+            <?php endwhile; ?>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Recent payments</h3>
+          </div>
+          <table class="table">
+            <thead>
+              <tr><th>ID</th><th>Student</th><th>Room</th><th>Amount</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+            <?php while ($p = $payments->fetch_assoc()): ?>
+              <tr>
+                <td><?php echo htmlspecialchars($p['payment_code'] ?: ('#P'.$p['id'])); ?></td>
+                <td><?php echo htmlspecialchars($p['student']); ?></td>
+                <td><?php echo htmlspecialchars($p['room_no']); ?></td>
+                <td>₹<?php echo htmlspecialchars($p['amount']); ?></td>
+                <td>
+                  <span class="badge-soft <?php echo $p['status']=='paid'?'green':($p['status']=='pending'?'yellow':'red'); ?>">
+                    <?php echo htmlspecialchars($p['status']); ?>
+                  </span>
+                </td>
+              </tr>
+            <?php endwhile; ?>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card" style="margin-top:14px;">
+          <div class="card-header">
+            <h3 class="card-title">Complaints</h3>
+          </div>
+          <table class="table">
+            <thead>
+              <tr><th>ID</th><th>Student</th><th>Subject</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+            <?php while ($c = $complaints->fetch_assoc()): ?>
+              <tr>
+                <td>#C<?php echo $c['id']; ?></td>
+                <td><?php echo htmlspecialchars($c['student']); ?></td>
+                <td><?php echo htmlspecialchars($c['subject']); ?></td>
+                <td>
+                  <span class="badge-soft <?php echo $c['status']=='Resolved'?'green':($c['status']=='Pending'?'red':'yellow'); ?>">
+                    <?php echo htmlspecialchars($c['status']); ?>
+                  </span>
+                </td>
+              </tr>
+            <?php endwhile; ?>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card" style="margin-top:14px;">
+          <div class="card-header">
+            <h3 class="card-title">Upcoming events</h3>
+          </div>
+          <?php while ($e = $events->fetch_assoc()): ?>
+            <div style="font-size:12px;margin-bottom:6px;">
+              <strong><?php echo htmlspecialchars($e['title']); ?></strong><br>
+              <span class="chip"><?php echo htmlspecialchars($e['location']); ?></span>
+              <span style="margin-left:6px;color:#6b7280;"><?php echo htmlspecialchars($e['event_date']); ?></span>
+            </div>
+          <?php endwhile; ?>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<div class="login-root">
+  <div class="login-card">
+
+    <!-- Left column: form -->
+    <div class="login-left">
+      <div class="login-left-inner">
+        <h1 class="login-title">LOGIN</h1>
+        <p class="login-subtitle">Sign in to manage your hostel account</p>
+
+        <?php if ($error): ?>
+          <div class="login-alert">
+            <?php echo htmlspecialchars($error); ?>
+          </div>
+        <?php endif; ?>
+
+        <form method="POST" class="login-form">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <div class="input-wrap">
+              <span class="input-icon">👤</span>
+              <input type="email" name="email" placeholder="you@example.com" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">🔒</span>
+              <input type="password" name="password" placeholder="••••••••" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">Login now</button>
+
+          <div class="form-footer">
+            <a href="fpassword.html">Forgot password?</a>
+          </div>
+        </form>
+
+        <div class="divider">
+          <span>or continue with</span>
+        </div>
+
+        <div class="social-buttons">
+          <button type="button" class="btn-social google">Log in with Google</button>
+          <button type="button" class="btn-social facebook">Log in with Facebook</button>
+        </div>
+
+        <div class="small-text">
+          Don’t have an account? <a href="register.html">Register</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right column: image panel -->
+    <div class="login-right">
+      <div class="login-hero">
+        <div class="login-hero-glass">
+          <div class="badge">Hostel Life</div>
+          <div class="hero-text">
+            <h2>Welcome back!</h2>
+            <p>Stay connected with your room, payments, and complaints in one place.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

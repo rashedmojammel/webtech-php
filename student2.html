@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="dash.css">
+</head>
+<body>
+  <div class="dash-shell">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Hostel</div>
+    <div class="sidebar-tagline">Student panel</div>
+    <ul class="sidebar-nav">
+      <li><a class="sidebar-link active" href="?controller=student&action=dashboard"><span class="icon">🏠</span>Dashboard</a></li>
+      <li><a class="sidebar-link" href="?controller=student&action=rooms"><span class="icon">🛏️</span>Rooms</a></li>
+      <li><a class="sidebar-link" href="#"><span class="icon">💳</span>Payments</a></li>
+      <li><a class="sidebar-link" href="#"><span class="icon">📄</span>Bookings</a></li>
+      <li><a class="sidebar-link" href="#"><span class="icon">⚠️</span>Complaints</a></li>
+      <li><a class="sidebar-link" href="/hostel_system/public/logout.php"><span class="icon">🚪</span>Logout</a></li>
+    </ul>
+    <div class="sidebar-footer">Logged in as student</div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-title">Student dashboard</div>
+        <div class="topbar-sub">Overview of your room, payments and complaints</div>
+      </div>
+      <div class="topbar-user">
+        <div class="topbar-avatar"><?php echo strtoupper($_SESSION['name'][0]); ?></div>
+        <span class="name"><?php echo htmlspecialchars($_SESSION['name']); ?></span>
+      </div>
+    </div>
+
+    <div class="main-inner">
+
+      <!-- Stats row -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Room number</div>
+          <div class="stat-value">
+            <?php echo $room ? htmlspecialchars($room['room_no']) : 'Not assigned'; ?>
+          </div>
+          <div class="stat-meta"><?php echo $room ? htmlspecialchars($room['type']) : ''; ?></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Payment status</div>
+          <div class="stat-value"><?php echo ucfirst($paymentStatus); ?></div>
+          <span class="stat-pill">Billing</span>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active complaints</div>
+          <div class="stat-value"><?php echo (int)$activeComplaintsCount; ?></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Days remaining</div>
+          <div class="stat-value"><?php echo $daysRemaining !== null ? $daysRemaining : '-'; ?></div>
+        </div>
+      </div>
+
+      <!-- Two-column content -->
+      <div class="dash-grid">
+        <!-- Left column -->
+        <section>
+          <!-- My room -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">My room</h3>
+              <span class="card-sub">
+                <?php echo $room ? 'Current booking' : 'No booking yet'; ?>
+              </span>
+            </div>
+            <?php if ($room && $activeBooking): ?>
+              <p style="font-size:13px;">
+                Room <?php echo htmlspecialchars($room['room_no']); ?> ·
+                <?php echo htmlspecialchars($room['type']); ?> · Floor
+                <?php echo htmlspecialchars($room['floor']); ?>
+              </p>
+              <p style="font-size:12px;color:#6b7280;">
+                Check-in: <?php echo htmlspecialchars($activeBooking['check_in_date']); ?><br>
+                Check-out: <?php echo htmlspecialchars($activeBooking['check_out_date']); ?>
+              </p>
+            <?php else: ?>
+              <p style="font-size:13px;">You do not have an active room booking.</p>
+            <?php endif; ?>
+            <a href="?controller=student&action=rooms" class="chip" style="margin-top:6px;display:inline-flex;">
+              View &amp; book rooms
+            </a>
+          </div>
+
+          <!-- My bookings -->
+          <div class="card" style="margin-top:16px;">
+            <div class="card-header">
+              <h3 class="card-title">My bookings</h3>
+              <span class="card-sub">History</span>
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Room</th><th>Booking date</th>
+                  <th>Check-in</th><th>Duration</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+              <?php while ($b = $bookings->fetch_assoc()): ?>
+                <tr>
+                  <td><?php echo htmlspecialchars($b['booking_code'] ?: ('#B'.$b['id'])); ?></td>
+                  <td><?php echo htmlspecialchars($b['room_no']); ?></td>
+                  <td><?php echo htmlspecialchars($b['booking_date']); ?></td>
+                  <td><?php echo htmlspecialchars($b['check_in_date']); ?></td>
+                  <td><?php echo (int)$b['duration_months']; ?> mo</td>
+                  <td><span class="badge-soft"><?php echo htmlspecialchars($b['status']); ?></span></td>
+                </tr>
+              <?php endwhile; ?>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Right column -->
+        <section>
+          <!-- Payments -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Payments</h3>
+            </div>
+            <?php
+              $totalPaid = 0;
+              $payments->data_seek(0);
+              while ($row = $payments->fetch_assoc()) {
+                  if ($row['status']==='paid') $totalPaid += $row['amount'];
+              }
+              $payments->data_seek(0);
+            ?>
+            <p style="font-size:13px;margin-bottom:6px;">
+              Total paid: ₹<?php echo $totalPaid; ?>
+            </p>
+            <table class="table">
+              <thead>
+                <tr><th>ID</th><th>Date</th><th>Amount</th><th>Month</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+              <?php while ($p = $payments->fetch_assoc()): ?>
+                <tr>
+                  <td><?php echo htmlspecialchars($p['payment_code'] ?: ('#P'.$p['id'])); ?></td>
+                  <td><?php echo htmlspecialchars($p['paid_at']); ?></td>
+                  <td>₹<?php echo htmlspecialchars($p['amount']); ?></td>
+                  <td><?php echo htmlspecialchars($p['for_month']); ?></td>
+                  <td>
+                    <span class="badge-soft <?php echo $p['status']=='paid'?'green':($p['status']=='pending'?'yellow':'red'); ?>">
+                      <?php echo htmlspecialchars($p['status']); ?>
+                    </span>
+                  </td>
+                </tr>
+              <?php endwhile; ?>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Complaints + form -->
+          <div class="card" style="margin-top:16px;">
+            <div class="card-header">
+              <h3 class="card-title">My complaints</h3>
+            </div>
+            <table class="table">
+              <thead>
+                <tr><th>ID</th><th>Subject</th><th>Date</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+              <?php while ($c = $complaints->fetch_assoc()): ?>
+                <tr>
+                  <td>#C<?php echo $c['id']; ?></td>
+                  <td><?php echo htmlspecialchars($c['subject']); ?></td>
+                  <td><?php echo htmlspecialchars($c['created_at']); ?></td>
+                  <td>
+                    <span class="badge-soft <?php echo $c['status']=='Resolved'?'green':($c['status']=='Pending'?'red':'yellow'); ?>">
+                      <?php echo htmlspecialchars($c['status']); ?>
+                    </span>
+                  </td>
+                </tr>
+              <?php endwhile; ?>
+              </tbody>
+            </table>
+
+            <form method="POST" action="?controller=student&action=addComplaint" style="margin-top:8px;font-size:12px;">
+              <strong>New complaint</strong><br>
+              <input name="subject" placeholder="Subject" required style="width:100%;margin-top:4px;">
+              <input name="category" placeholder="Category" required style="width:100%;margin-top:4px;">
+              <textarea name="description" rows="2" placeholder="Describe the issue" required style="width:100%;margin-top:4px;"></textarea>
+              <button type="submit" class="chip" style="border:none;margin-top:5px;cursor:pointer;">Submit</button>
+            </form>
+          </div>
+
+          <!-- Events -->
+          <div class="card" style="margin-top:16px;">
+            <div class="card-header">
+              <h3 class="card-title">Upcoming events</h3>
+            </div>
+            <?php if ($events->num_rows): ?>
+              <?php while ($e = $events->fetch_assoc()): ?>
+                <div style="font-size:12px;margin-bottom:6px;">
+                  <strong><?php echo htmlspecialchars($e['title']); ?></strong>
+                  <span class="chip"><?php echo htmlspecialchars($e['event_date']); ?></span><br>
+                  <span style="color:#6b7280;"><?php echo htmlspecialchars($e['location']); ?></span>
+                </div>
+              <?php endwhile; ?>
+            <?php else: ?>
+              <p style="font-size:12px;color:#6b7280;">No events yet.</p>
+            <?php endif; ?>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

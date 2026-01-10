@@ -12,5 +12,5 @@ function greet ($name="Guest"){
 greet();
 greet("Rashed");
 
-echo "hello" . $_REQUEST["username"];
+
 ?>

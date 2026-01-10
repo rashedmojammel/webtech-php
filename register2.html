@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Set new password</title>
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<div class="login-root">
+  <div class="login-card">
+
+    <div class="login-left">
+      <div class="login-left-inner">
+        <h1 class="login-title">SET NEW PASSWORD</h1>
+        <p class="login-subtitle">
+          Email: <?php echo htmlspecialchars($email); ?>
+        </p>
+
+        <?php if ($error): ?>
+          <div class="login-alert"><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
+
+        <form method="POST" class="login-form">
+          <div class="form-group">
+            <label class="form-label">New password</label>
+            <div class="input-wrap">
+              <span class="input-icon">🔒</span>
+              <input type="password" name="password" placeholder="••••••••" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Confirm new password</label>
+            <div class="input-wrap">
+              <span class="input-icon">🔒</span>
+              <input type="password" name="confirm_password" placeholder="••••••••" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">Reset password</button>
+
+          <div class="small-text">
+            <a href="login.html">Back to login</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="login-right">
+      <div class="login-hero">
+        <div class="login-hero-glass">
+          <div class="badge">Hostel Life</div>
+          <div class="hero-text">
+            <h2>Almost done</h2>
+            <p>Choose a strong password and keep your hostel account secure.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
