@@ -1,0 +1,98 @@
+<?php
+// Initialize variables
+$name = $email = $subject = $message = "";
+$success = "";
+$errors = [];
+
+// Check form submit
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    // Sanitize inputs
+    $name = htmlspecialchars(trim($_POST["name"]));
+    $email = htmlspecialchars(trim($_POST["email"]));
+    $subject = htmlspecialchars($_POST["subject"]);
+    $message = htmlspecialchars(trim($_POST["message"]));
+
+    // Validation
+    if (empty($name)) {
+        $errors[] = "Name is required";
+    }
+
+    if (empty($email)) {
+        $errors[] = "Email is required";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Invalid email format";
+    }
+
+    if (strlen($message) < 10) {
+        $errors[] = "Message must be at least 10 characters";
+    }
+
+    // File validation (optional)
+    if (!empty($_FILES["attachment"]["name"])) {
+        $allowed = ["image/jpeg", "image/png", "application/pdf"];
+        if (!in_array($_FILES["attachment"]["type"], $allowed)) {
+            $errors[] = "Invalid file type";
+        }
+        if ($_FILES["attachment"]["size"] > 2 * 1024 * 1024) {
+            $errors[] = "File size must be less than 2MB";
+        }
+    }
+
+    // If no errors
+    if (empty($errors)) {
+        $success = "Email sent successfully!";
+        // Clear form values
+        $name = $email = $subject = $message = "";
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contact Form</title>
+</head>
+<body>
+
+<h2>Contact Us</h2>
+
+<!-- Show Errors -->
+<?php
+if (!empty($errors)) {
+    foreach ($errors as $e) {
+        echo "<p style='color:red;'>$e</p>";
+    }
+}
+?>
+
+<!-- Show Success -->
+<?php if ($success) { ?>
+    <p style="color:green;"><?php echo $success; ?></p>
+<?php } ?>
+
+<form method="post" enctype="multipart/form-data">
+    Name:<br>
+    <input type="text" name="name" value="<?php echo $name; ?>"><br><br>
+
+    Email:<br>
+    <input type="text" name="email" value="<?php echo $email; ?>"><br><br>
+
+    Subject:<br>
+    <select name="subject">
+        <option>General</option>
+        <option>Support</option>
+        <option>Feedback</option>
+    </select><br><br>
+
+    Message:<br>
+    <textarea name="message"><?php echo $message; ?></textarea><br><br>
+
+    Attachment:<br>
+    <input type="file" name="attachment"><br><br>
+
+    <button type="submit">Send</button>
+</form>
+
+</body>
+</html>
